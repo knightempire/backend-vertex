@@ -24,7 +24,6 @@ const sendregisterEmail = async (username, name, type) => {
 
     let htmlContent;
     if (type === 'admin') {
-     
       htmlContent = TEMPLATE_ADMIN_WELCOME_MAIL(name, verificationUrl);
     } else {
       htmlContent = TEMPLATE_WELCOME_MAIL(name, verificationUrl);
