@@ -55,15 +55,11 @@ const loginUser = async (req, res) => {
       // Create user data with product details populated
       const userData = {
         id: user._id,
+        main_username: user.main_username,
         username: user.username,
         name: user.name,
         isActive: user.isActive,
         role:user.role,
-        product_access: user.product_access.map(access => ({
-          product_id: access.product_id._id, 
-          product_name: access.product_id.name, 
-          accessGranted: access.accessGranted,
-        })),
       };
   
       console.log("login",userData)
@@ -388,6 +384,36 @@ const registerUser = async (req, res) => {
   };
   
   
+  const newusernamecheck = async (req, res) => {
+    try {
+      const { main_username } = req.body;
+  
+      console.log('Username received:', main_username);
+  
+      // Check if the username is provided
+      if (!main_username) {
+        console.log('Missing username');
+        return res.status(400).json({ message: 'Username is required' });
+      }
+  
+      // Find the user by username
+      const existingUser = await User.findOne({ main_username });
+      if (existingUser) {
+        console.log('Username exist');
+        return res.status(400).json({ message: 'Username exist' });
+      }
+  
+      // Respond with a success message
+      res.status(200).json({
+        status: 200,
+        message: 'Username available',
+        main_username,
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
 
 
-module.exports = { loginUser, verifyToken , registerUser,createuserandPassword ,forgotPassword,resetPassword, verifyMainToken };
+module.exports = { loginUser, verifyToken , registerUser,createuserandPassword ,forgotPassword,resetPassword, verifyMainToken , newusernamecheck };

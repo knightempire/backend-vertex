@@ -33,7 +33,7 @@ const sendregisterEmail = async (username, name, type) => {
     const info = await transporter.sendMail({
       from: `"no-reply" <${process.env.EMAIL_USER}>`,
       to: `${username}`,
-      subject: `Makar - Verify Your Email and Set Your Password`, 
+      subject: `Vertx - Verify Your Email and Set Your Password`, 
       text: `Hello ${name},\n\nWelcome! Click the link below to verify your email and set your password:\n\n${verificationUrl}`, 
       html: htmlContent,
     });
@@ -63,7 +63,7 @@ const sendforgotEmail = async (username, name) => {
     const info = await transporter.sendMail({
       from: `"no-reply" <${process.env.EMAIL_USER}>`,
       to: `${username}`,
-      subject: `Makar - Reset Your Password`, 
+      subject: `Vertx - Reset Your Password`, 
       text: `Hello ${name},\n\nWelcome! Click the reset button below to reset your password:\n\n${verificationUrl}`, 
       html: htmlContent,
     });

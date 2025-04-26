@@ -1,7 +1,7 @@
 // routes/user.js
 const express = require('express');
 const user = express.Router();  
-const { loginUser, verifyToken,registerUser, createuserandPassword ,resetPassword , forgotPassword,verifyMainToken} = require('../controllers/login.contollers');
+const { loginUser, verifyToken,registerUser, createuserandPassword ,resetPassword , forgotPassword,verifyMainToken , newusernamecheck} = require('../controllers/login.contollers');
 const {tokenValidator,verifyRegisterToken,verifyForgotToken,readverifyRegisterTokens, readverifyForgotToken} = require('../middleware/auth/tokenvalidate');
 
 
@@ -21,6 +21,6 @@ user.post('/forgotpassword',forgotPassword,)
 user.post('/resetpassword', verifyForgotToken, resetPassword);
 
 
-
+user.get('/check/main_username', newusernamecheck, verifyToken);
 
 module.exports = user;
