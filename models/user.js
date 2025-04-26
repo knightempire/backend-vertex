@@ -5,8 +5,8 @@ const moment = require('moment-timezone');
 const userSchema = new mongoose.Schema({
   username:   { type: String, required: true, unique: true },
   password:   { type: String, required: true }, 
-  email:      { type: String, required: true, unique: true },
-
+  main_username:      { type: String, required: true, unique: true },
+  name:       { type: String, required: true },
   loginHistory: [{ type: Date }], 
   rewardPoints: { type: Number, default: 0 }, 
   lastLoginDate: { type: Date }, 

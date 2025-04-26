@@ -64,12 +64,14 @@ async function forgotmailtoken(data) {
     if (!forgot_secret_key) {
         throw new Error('FORGOT_SECRET_KEY is not defined in the environment variables.');
     }
-
+    console.log("forgotmailtoken")
 
     data.secret_key = forgot_secret_key;
 
+    console.log("forgotmailtoken data",data)
     const newToken = new Token({
         token: "123", 
+        username: data.username,
     });
 
     const savedToken = await newToken.save();

@@ -14,7 +14,7 @@ const verifyToken = (req, res) => {
   
       res.status(200).json({
         status: 200,
-        message: 'Token is valid',
+        message: 'Token is valid verify',
         user: {
           username: req.body.username,
           userId: req.body.userId,
@@ -285,7 +285,7 @@ const registerUser = async (req, res) => {
   
       // Create a new user instance
       console.log('Creating new user with username:', username);
-      const newUser = new User({ username, password , name });
+      const newUser = new User({ username, password , name ,main_username});
   
       // Save the user to the database
       console.log('Saving new user to the database');

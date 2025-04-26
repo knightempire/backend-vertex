@@ -174,15 +174,17 @@ const TEMPLATE_WELCOME_MAIL = (name, verificationUrl) => {
             <img class="logo" src="https://i.imgur.com/fwPyqMU.png" alt="">
         </header>
     
-        <main>
+ <main>
             <h1>Hello ${name},</h1> <br>
             
-             <p class="verification-text">We received a request to reset your password. To get started, please click the button below to reset your password.</p>
+            <p class="verification-text">Welcome to VERTX – your go-to hub for real-time content! Stay updated with trending posts and discussions from across the web, all curated just for you.</p>
 
+            
+      
             <div class="verification-code">
                 <a href="${verificationUrl}" target="_blank">
                     <button>
-                        Reset Password
+                        Verify
                     </button>
                 </a>
             </div>
@@ -191,8 +193,8 @@ const TEMPLATE_WELCOME_MAIL = (name, verificationUrl) => {
     
             <p class="regards-text">
                 Regards, <br>
-                VERTX 
-          
+                VERTX <br>
+              
             </p>
         </main>
     

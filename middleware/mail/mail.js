@@ -49,8 +49,9 @@ const sendregisterEmail = async (username, name, type) => {
 
 const sendforgotEmail = async (username, name) => {
   try {
+
     const tokenData = { username, name }; 
-    
+    console.log("tokenData", tokenData)
     console.log("sendforgotEmail")
     const token = await forgotmailtoken(tokenData); 
 

@@ -1,23 +1,28 @@
+
 const mongoose = require('mongoose');
 const moment = require('moment-timezone');
 
-// Define the schema for the token
 const tokenSchema = new mongoose.Schema({
   token: {
     type: String,
     required: true,
-    unique: true,  
+    unique: true,
   },
   createdAt: {
-    type: String,
-    default: () => moment.tz("Asia/Kolkata").format('YYYY-MM-DD HH:mm:ss'),  // Date and time format
-    expires: 300,
+    type: Date,
+    default: () => moment.tz("Asia/Kolkata").toDate(),
   },
   username: {
     type: String,
     required: true,  // Assuming you want to require the username
   },
+
 });
+
+// Default TTL of 5 minutes (300 seconds)
+tokenSchema.index({ createdAt: 1 }, { expireAfterSeconds: 300 });
+
+
 
 // Create a Token model using the schema
 const Token = mongoose.model('Token', tokenSchema);
