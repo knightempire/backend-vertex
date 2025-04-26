@@ -16,6 +16,7 @@ const transporter = nodemailer.createTransport({
 
 const sendregisterEmail = async (username, name, type) => {
   try {
+    console.log("sendregisterEmail")
     const tokenData = { username, name }; 
     const token = await registermailtoken(tokenData, type); 
     console.log(token);

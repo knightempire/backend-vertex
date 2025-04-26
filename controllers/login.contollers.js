@@ -1,9 +1,9 @@
-// controllers/userController.js
+// controllers/login.contollers.js
 require('dotenv').config();
 
 const bcrypt = require('bcryptjs');
 const User = require('../models/user'); 
-const Product = require('../models/product');
+const Token = require('../models/token');
 const {createToken} = require('../middleware/auth/tokencreation'); 
 const {sendregisterEmail,sendforgotEmail} = require('../middleware/mail/mail'); 
 const moment = require('moment-timezone'); 
@@ -241,14 +241,8 @@ const registerUser = async (req, res) => {
         return res.status(400).json({ message: 'Username already exists' });
       }
   
-      // Create the token with the username
-      const newToken = new Token({
-        token: generateRandomToken(),  
-        username: username,  
-      });
-      await newToken.save();
-  
 
+      console.log('Creating new user instance with username:', username);
       await sendregisterEmail(username, name, type);
   
 

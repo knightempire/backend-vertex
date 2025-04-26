@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');  
 const { connectToDb, getDb } = require('./config/db'); 
 
+const userRouter = require('./routers/user');
 
 
 const app = express();
@@ -25,6 +26,7 @@ app.get('/', (req, res) => {
   }
 });
 
+app.use('/users', userRouter);
 
 connectToDb().then(() => {
   app.listen(port, () => {

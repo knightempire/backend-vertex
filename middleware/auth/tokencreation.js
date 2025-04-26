@@ -33,11 +33,13 @@ async function registermailtoken(data) {
         throw new Error('MAIL_SECRET_KEY is not defined in the environment variables.');
     }
 
+    console.log("registermailtoken")
 
     data.secret_key = mail_secret_key;
 
     const newToken = new Token({
         token: "123", 
+        username: data.username,
     });
 
     const savedToken = await newToken.save();
