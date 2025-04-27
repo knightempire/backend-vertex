@@ -171,7 +171,7 @@ const TEMPLATE_WELCOME_MAIL = (name, verificationUrl) => {
    <body>
     <div class="container">
         <header>
-            <img class="logo" src="https://i.imgur.com/fwPyqMU.png" alt="">
+            <img class="logo" src="https://images.ctfassets.net/tyqyfq36jzv2/4LDyHu4fEajllYmI8y5bj7/124bcfb1b6a522326d7d90ac1e3debc8/Linkedin-logo-png.png" alt="">
         </header>
     
  <main>
@@ -219,7 +219,7 @@ const TEMPLATE_RESET_MAIL = (name, verificationUrl) => {
      <body>
     <div class="container">
         <header>
-            <img class="logo" src="https://i.imgur.com/fwPyqMU.png" alt="">
+            <img class="logo" src="https://images.ctfassets.net/tyqyfq36jzv2/4LDyHu4fEajllYmI8y5bj7/124bcfb1b6a522326d7d90ac1e3debc8/Linkedin-logo-png.png" alt="">
         </header>
     
         <main>
@@ -265,7 +265,7 @@ const TEMPLATE_RESET_MAIL = (name, verificationUrl) => {
     <body>
     <div class="container">
         <header>
-            <img class="logo" src="https://i.imgur.com/fwPyqMU.png" alt="">
+            <img class="logo" src="https://images.ctfassets.net/tyqyfq36jzv2/4LDyHu4fEajllYmI8y5bj7/124bcfb1b6a522326d7d90ac1e3debc8/Linkedin-logo-png.png" alt="">
         </header>
     
         <main>
