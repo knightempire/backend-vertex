@@ -1,7 +1,8 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const jwt = require('jsonwebtoken');
+
 const session = require('express-session');
+const googleLogin = require('../controllers/google.login');
 
 function initGoogleAuth(app) {
   console.log('🔧 Initializing Google Auth middleware...');
@@ -56,26 +57,19 @@ function initGoogleAuth(app) {
   );
 
   app.get('/auth/google/callback',
-    
     (req, res, next) => {
-      console.log('🔙 Google callback received');
-      next();
+      console.log('➡️ Google callback triggered');
+      next();  // Continue to the next middleware
     },
     passport.authenticate('google', { failureRedirect: `${process.env.STATIC_URL}/login`, session: false }),
-    (req, res) => {
-      console.log('🔐 Creating JWT for user:', req.user);
-
-      const token = jwt.sign(
-        { id: req.user.id, name: req.user.name, email: req.user.email },
-        process.env.JWT_SECRET,
-        { expiresIn: '1h' }
-      );
-
-      console.log('📦 JWT:', token);
-
-      res.redirect(`${process.env.STATIC_URL}/login?token=${token}`);
-    }
+    (req, res, next) => {
+      console.log('✅ Google authentication successful');
+      next();  // Continue to the next middleware
+    },
+    googleLogin // Call the controller after authentication
   );
+  
+
 }
 
 module.exports = initGoogleAuth;
