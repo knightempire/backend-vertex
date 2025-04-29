@@ -1,82 +1,68 @@
 require('dotenv').config();
-const nodemailer = require('nodemailer');
-const {TEMPLATE_WELCOME_MAIL, TEMPLATE_RESET_MAIL ,TEMPLATE_ADMIN_WELCOME_MAIL} = require('./mail_temp');
-const {registermailtoken, forgotmailtoken} = require('../auth/tokencreation');  
+const sgMail = require('@sendgrid/mail');
+const { TEMPLATE_WELCOME_MAIL, TEMPLATE_RESET_MAIL, TEMPLATE_ADMIN_WELCOME_MAIL } = require('./mail_temp');
+const { registermailtoken, forgotmailtoken } = require('../auth/tokencreation');
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST, 
-  port: process.env.EMAIL_PORT, 
-  secure: process.env.EMAIL_SECURE === 'true',
-  auth: {
-    user: process.env.EMAIL_USER, 
-    pass: process.env.EMAIL_PASS, 
-  },
-});
-
+sgMail.setApiKey(process.env.SENDGRID_API_KEY); 
 
 const sendregisterEmail = async (username, name, type) => {
   try {
-    console.log("sendregisterEmail")
-    const tokenData = { username, name }; 
-    const token = await registermailtoken(tokenData, type); 
+    console.log("sendregisterEmail");
+
+    const tokenData = { username, name };
+    const token = await registermailtoken(tokenData, type);
     console.log(token);
 
     const verificationUrl = `${process.env.STATIC_URL}/password?token=${token}#type=register`;
 
-    let htmlContent;
-    if (type === 'admin') {
-      htmlContent = TEMPLATE_ADMIN_WELCOME_MAIL(name, verificationUrl);
-    } else {
-      htmlContent = TEMPLATE_WELCOME_MAIL(name, verificationUrl);
-    }
+    const htmlContent = type === 'admin'
+      ? TEMPLATE_ADMIN_WELCOME_MAIL(name, verificationUrl)
+      : TEMPLATE_WELCOME_MAIL(name, verificationUrl);
 
-    const info = await transporter.sendMail({
-      from: `"no-reply" <${process.env.EMAIL_USER}>`,
-      to: `${username}`,
-      subject: `Vertx - Verify Your Email and Set Your Password`, 
-      text: `Hello ${name},\n\nWelcome! Click the link below to verify your email and set your password:\n\n${verificationUrl}`, 
+    const msg = {
+      to: username,
+      from: process.env.EMAIL_FROM, // e.g. 'noreply@yourdomain.com'
+      subject: 'Vertx - Verify Your Email and Set Your Password',
+      text: `Hello ${name},\n\nWelcome! Click the link below to verify your email and set your password:\n\n${verificationUrl}`,
       html: htmlContent,
-    });
+    };
 
-    console.log("Message sent: %s", info.messageId); 
+    await sgMail.send(msg);
+    console.log("Register email sent successfully ✅");
+
   } catch (error) {
-    console.error("Error sending email:", error);
-    throw new Error('Error sending email');
+    console.error("Error sending register email ❌:", error.response?.body || error);
+    throw new Error('Error sending register email');
   }
 };
 
-
-
 const sendforgotEmail = async (username, name) => {
   try {
+    console.log("sendforgotEmail");
 
-    const tokenData = { username, name }; 
-    console.log("tokenData", tokenData)
-    console.log("sendforgotEmail")
-    const token = await forgotmailtoken(tokenData); 
-
+    const tokenData = { username, name };
+    const token = await forgotmailtoken(tokenData);
     console.log(token);
+
     const verificationUrl = `${process.env.STATIC_URL}/password?token=${token}#type=forgot`;
 
     const htmlContent = TEMPLATE_RESET_MAIL(name, verificationUrl);
 
-    const info = await transporter.sendMail({
-      from: `"no-reply" <${process.env.EMAIL_USER}>`,
-      to: `${username}`,
-      subject: `Vertx - Reset Your Password`, 
-      text: `Hello ${name},\n\nWelcome! Click the reset button below to reset your password:\n\n${verificationUrl}`, 
+    const msg = {
+      to: username,
+      from: process.env.EMAIL_FROM,
+      subject: 'Vertx - Reset Your Password',
+      text: `Hello ${name},\n\nClick the link below to reset your password:\n\n${verificationUrl}`,
       html: htmlContent,
-    });
+    };
 
-    console.log("Message sent: %s", info.messageId); 
+    await sgMail.send(msg);
+    console.log("Forgot password email sent successfully ✅");
+
   } catch (error) {
-    console.error("Error sending email:", error);
-    throw new Error('Error sending email');
+    console.error("Error sending forgot password email ❌:", error.response?.body || error);
+    throw new Error('Error sending forgot password email');
   }
 };
 
-
-
-
-// Export the function to send emails
-module.exports = { sendregisterEmail, sendforgotEmail};
+module.exports = { sendregisterEmail, sendforgotEmail };
