@@ -115,5 +115,35 @@ const userprofile = async (req, res) => {
 };
 
 
+const getLoginDates = async (req, res) => {
+    try {
+      const { email } = req.body;
+  
+      if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+      }
+  
+      // Step 1: Find the user by email
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      // Step 2: Return the loginDates, loginScores, and streak associated with that user
+      res.status(200).json({
+        message: 'Login data fetched successfully',
+        loginDates: user.loginDates,   // Send the loginDates from the User model
+        loginScores: user.loginScores, // Send the loginScores from the User model
+        streak: user.streak,           // Send the streak from the User model
+      });
+  
+    } catch (error) {
+      console.error('Error fetching login data:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+  
+  
 
-module.exports = { userprofile ,updateProfile};
+
+module.exports = { userprofile ,updateProfile, getLoginDates};

@@ -31,44 +31,60 @@ const verifyToken = (req, res) => {
   };
 
 
-// Function to log in a user
-const loginUser = async (req, res) => {
+  const loginUser = async (req, res) => {
     try {
       const { email, password } = req.body;
   
-      const user = await User.findOne({ email })
+      // Find user by email
+      const user = await User.findOne({ email });
       if (!user) {
         return res.status(400).json({ message: 'Invalid email or password' });
       }
+      
       console.log('User found:', user);
       console.log('User active:', user.isActive);
   
-    
+      // Check if the user is active
       if (!user.isActive) {
         return res.status(400).json({ message: 'User is inactive. Please contact support.' });
       }
   
+      // Check if the password matches
       const isPasswordMatch = await bcrypt.compare(password, user.password);
       if (!isPasswordMatch) {
         return res.status(400).json({ message: 'Invalid email or password' });
       }
   
-      // Create user data with product details populated
+      // Get today's date in 'Asia/Kolkata' timezone
+      const today = moment().tz('Asia/Kolkata').format('YYYY-MM-DD');
+      
+      // Check if the login date already exists in the loginDates array
+      if (!user.loginDates.includes(today)) {
+        // Add today's date to the loginDates array
+        user.loginDates.push(today);
+        
+        // Save the updated user document
+        await user.save();
+      }
+  
+      // Prepare user data to send to the client
       const userData = {
         id: user._id,
         username: user.username,
         email: user.email,
         name: user.name,
         isActive: user.isActive,
-        role:user.role,
+        role: user.role,
       };
   
-      console.log("login",userData)
+      console.log("login", userData);
   
-      const token = await createToken(userData);  
+      // Create a token for the user
+      const token = await createToken(userData);
   
+      // Clean up userData before sending it to the client
       delete userData.secret_key;
-      delete userData.id; 
+      delete userData.id;
   
       // Send response to the client
       res.status(200).json({
@@ -81,7 +97,7 @@ const loginUser = async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
     }
   };
-
+  
 
 
   const verifyMainToken = async (req, res) => {

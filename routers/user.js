@@ -3,7 +3,7 @@ const express = require('express');
 const user = express.Router();  
 const { loginUser, verifyToken,registerUser, createuserandPassword ,resetPassword , forgotPassword,verifyMainToken , newusernamecheck} = require('../controllers/login.contollers');
 const {tokenValidator,verifyRegisterToken,verifyForgotToken,readverifyRegisterTokens, readverifyForgotToken} = require('../middleware/auth/tokenvalidate');
-const { userprofile,updateProfile } = require('../controllers/profile.controller');
+const { userprofile,updateProfile,getLoginDates } = require('../controllers/profile.controller');
 
 
 user.post('/login', loginUser);
@@ -24,6 +24,6 @@ user.post('/resetpassword', verifyForgotToken, resetPassword);
 user.post('/check/username', newusernamecheck);
 user.post('/profile', tokenValidator,userprofile);
 user.post('/profile/update', tokenValidator,updateProfile);
-
+user.post('/activity', tokenValidator,getLoginDates);
 
 module.exports = user;
