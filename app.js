@@ -3,8 +3,9 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');  
-const { connectToDb, getDb } = require('./config/db'); 
 
+const { connectToDb, getDb } = require('./config/db'); 
+const initGoogleAuth = require('./middleware/google.auth.js');
 const userRouter = require('./routers/user');
 
 
@@ -27,6 +28,10 @@ app.get('/', (req, res) => {
 });
 
 app.use('/users', userRouter);
+
+
+initGoogleAuth(app);
+
 
 connectToDb().then(() => {
   app.listen(port, () => {
