@@ -7,7 +7,7 @@ const googleLogin = async (req, res) => {
   try {
     const profile = req.user;
     const email = profile?.email;
-    const name = profile?.displayName || 'Default Name';
+
     const googleId = profile?.id;
 
     console.log('🔍 User Profile:', profile);
@@ -25,6 +25,7 @@ const googleLogin = async (req, res) => {
       username = `user_${googleId}`;
     }
 
+    const name = profile?.displayName || username ;
     console.log("Generated username:", username);
 
     if (!user) {
@@ -39,18 +40,18 @@ const googleLogin = async (req, res) => {
       try {
         await user.save();
       } catch (error) {
-        if (error.code === 11000) { // MongoDB Duplicate Key Error
+        if (error.code === 11000) { 
           console.error('Duplicate username error, trying with a new username');
-          username = `user_${uuidv4()}`; // Generate a new username if there's a conflict
+          username = `user_${uuidv4()}`; 
 
-          // Ensure that the user object is updated with the new username
+     
           user.username = username;
           console.log("Retrying with new username:", username);
 
-          // Retry saving the user with the new username
-          await user.save(); // Retry saving with the new username
+   
+          await user.save(); 
         } else {
-          throw error; // Rethrow the error if it's something else
+          throw error; 
         }
       }
     } else {

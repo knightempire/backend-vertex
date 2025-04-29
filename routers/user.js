@@ -7,7 +7,7 @@ const {tokenValidator,verifyRegisterToken,verifyForgotToken,readverifyRegisterTo
 
 
 user.post('/login', loginUser);
-
+user.post('/verify-token', tokenValidator, verifyMainToken); // Middleware to validate the token
 
 
 user.get('/verify-token-forgot',  readverifyForgotToken, verifyToken);
