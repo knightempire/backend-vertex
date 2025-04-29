@@ -349,7 +349,7 @@ const registerUser = async (req, res) => {
   const resetPassword = async (req, res) => {
     try {
       const { password, email } = req.body;
-  
+      console.log('resetPassword')
       console.log('Received email:', email);
       console.log('Received password:', password);
   

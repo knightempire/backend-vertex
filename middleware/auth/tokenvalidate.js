@@ -126,7 +126,8 @@ async function readverifyForgotToken(req, res, next) {
         const payload = await verify(token, public_key);
         console.log("Decoded payload:", payload);
 
-        if (payload && payload.secret_key === mail_secret_key) {
+        console.log("Decoded are ", )
+        if (payload && payload.secret_key === forgot_secret_key) {
 
             req.body = req.body || {};  
 
