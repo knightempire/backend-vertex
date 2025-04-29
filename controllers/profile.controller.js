@@ -123,18 +123,23 @@ const getLoginDates = async (req, res) => {
         return res.status(400).json({ message: 'Email is required' });
       }
   
-      // Step 1: Find the user by email
-      const user = await User.findOne({ email });
+      // Step 1: Find the user by email and use .lean() to get a plain JavaScript object
+      const user = await User.findOne({ email }).lean(); // Use lean to get a plain object
+  
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
   
-      // Step 2: Return the loginDates, loginScores, and streak associated with that user
+      // Step 2: Log and send back activeTime as a proper array
+      console.log('Raw activeTime:', user.activeTime); // This should now log an actual array
+  
+      // Step 3: Return the loginDates, loginScores, streak, and activeTime
       res.status(200).json({
         message: 'Login data fetched successfully',
-        loginDates: user.loginDates,   // Send the loginDates from the User model
-        loginScores: user.loginScores, // Send the loginScores from the User model
-        streak: user.streak,           // Send the streak from the User model
+        loginDates: user.loginDates,
+        loginScores: user.loginScores,
+        streak: user.streak,
+        activeTime: user.activeTime, // This will be an array now
       });
   
     } catch (error) {
@@ -143,7 +148,60 @@ const getLoginDates = async (req, res) => {
     }
   };
   
+  const addActiveTime = async (req, res) => {
+    try {
+      console.log("Adding active time");
+      console.log("Request body:", req.body);
+      const { email, activityTime } = req.body; // Get the email and activity time from the request body
+  
+      if (!email || activityTime === undefined) {
+        return res.status(400).json({ message: 'Email and activity time are required' });
+      }
+  
+      // Step 1: Find the user by email
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      // Step 2: Get the current day of the week and date in Asia/Kolkata timezone
+      const now = moment().tz('Asia/Kolkata');
+      const dayOfWeek = now.day(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  
+      console.log(`Day of the week: ${dayOfWeek}`); // Log the day of the week for debugging
+  
+      // Step 3: Update the activeTime array for the current day
+      const activeTime = [...user.activeTime]; // Make a copy of the activeTime array
+  
+      // If the day is already within the activeTime array (index 0-6 corresponding to Mon-Sun)
+      if (activeTime[dayOfWeek] !== undefined) {
+        // If activity time already exists for this day, add to the existing time
+        activeTime[dayOfWeek] += activityTime;
+      } else {
+        // Otherwise, initialize the activity time for the day
+        activeTime[dayOfWeek] = activityTime;
+      }
+  
+      // Step 4: Update the user's activeTime array in the database
+      user.activeTime = activeTime;
+  
+      // Save the user document
+      await user.save();
+  
+      // Step 5: Return the updated activeTime
+      res.status(200).json({
+        message: 'Activity time updated successfully',
+        activeTime: user.activeTime, // Send the updated activeTime array
+      });
+    } catch (error) {
+      console.error('Error adding active time:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+  
+
+  
   
 
 
-module.exports = { userprofile ,updateProfile, getLoginDates};
+module.exports = { userprofile ,updateProfile, getLoginDates,addActiveTime};
