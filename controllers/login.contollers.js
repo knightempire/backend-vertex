@@ -1,9 +1,10 @@
 // controllers/login.contollers.js
 require('dotenv').config();
-const bcrypt = require('bcryptjs');
+
 
 const bcrypt = require('bcryptjs');
 const User = require('../models/user'); 
+const Profile = require('../models/Profile');
 const Token = require('../models/token');
 const {createToken} = require('../middleware/auth/tokencreation'); 
 const {sendregisterEmail,sendforgotEmail} = require('../middleware/mail/mail'); 
@@ -83,55 +84,56 @@ const loginUser = async (req, res) => {
 
 
 
-const verifyMainToken = async (req, res) => {
-  try {
-
-    const { email, username  } = req.body;
-
-
-    console.log('Incoming request body:', req.body);
-
-
-    const user = await User.findOne({ email: req.body.email });
-
-
-
-    console.log('Fetched user from database:', user);
-
-    if (!user) {
-      return res.status(401).json({
-        message: 'User not found',
+  const verifyMainToken = async (req, res) => {
+    try {
+      const { email, username } = req.body;
+      console.log('Incoming request body:', req.body);
+  
+      // Find user by email
+      const user = await User.findOne({ email: req.body.email });
+      console.log('Fetched user from database:', user);
+  
+      if (!user) {
+        return res.status(401).json({
+          message: 'User not found',
+        });
+      }
+  
+      if (user.isActive === 0) {
+        return res.status(403).json({
+          message: 'User is inactive',
+        });
+      }
+  
+      // Find the user's profile by userId
+      const profile = await Profile.findOne({ userId: user._id });
+  
+      // If profile exists, send it with the response
+      if (profile) {
+        console.log('Fetched profile:', profile);
+      }
+  
+      // Return response with user and profile information
+      return res.status(200).json({
+        status: 200,
+        message: 'Token is valid',
+        user: {
+          email: email,
+          name: user.name,
+          isActive: user.isActive,
+          role: user.role,
+          username: username,
+          profile: profile ? profile : null, // Include profile if it exists
+        },
+      });
+    } catch (err) {
+      console.error('Token verification error:', err);
+      res.status(401).json({
+        message: 'Invalid or expired token',
       });
     }
-
-    if (user.isActive === 0) {
-      return res.status(403).json({
-        message: 'User is inactive',
-      });
-    }
-
-
- 
-    // Step 6: If access is valid, return the response with matching result
-    return res.status(200).json({
-      status: 200,
-      message: 'Token is valid',
-      user: {
-        email: email,
-        name: user.name,
-        isActive: user.isActive,
-        role:user.role,
-        username: username,
-      },
-    });
-
-  } catch (err) {
-    console.error('Token verification error:', err);
-    res.status(401).json({
-      message: 'Invalid or expired token',
-    });
-  }
-};
+  };
+  ;
 
 // Function to register and send mail
 const registerUser = async (req, res) => {
@@ -261,10 +263,7 @@ const registerUser = async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
     }
   };
-  
-  
-  // Function to reset password 
-  const bcrypt = require('bcryptjs');
+
 
   // Function to reset user password
   const resetPassword = async (req, res) => {

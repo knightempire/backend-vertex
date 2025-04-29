@@ -7,7 +7,6 @@ const googleLogin = async (req, res) => {
   try {
     const profile = req.user;
     const email = profile?.email;
-
     const googleId = profile?.id;
 
     console.log('🔍 User Profile:', profile);
@@ -21,12 +20,13 @@ const googleLogin = async (req, res) => {
 
     // Ensure username is not null or empty
     if (!username) {
-
       username = `user_${googleId}`;
     }
 
-    const name = profile?.displayName || username ;
+    const name = profile?.displayName || username;
     console.log("Generated username:", username);
+
+    let isNewUser = false; // Flag to indicate if the user is newly created
 
     if (!user) {
       // Create new user
@@ -39,17 +39,16 @@ const googleLogin = async (req, res) => {
 
       try {
         await user.save();
+        isNewUser = true; // User was newly created
       } catch (error) {
         if (error.code === 11000) { 
           console.error('Duplicate username error, trying with a new username');
           username = `user_${uuidv4()}`; 
-
-     
           user.username = username;
           console.log("Retrying with new username:", username);
-
    
           await user.save(); 
+          isNewUser = true; // User was newly created with new username
         } else {
           throw error; 
         }
@@ -58,7 +57,15 @@ const googleLogin = async (req, res) => {
       console.log("User found:", user);
     }
 
-    const token = await createToken(user.toObject());
+    // Create the token, including userId and isNewUser flag in the payload
+    const userPayload = {
+      userId: user._id,   // Include userId here
+      name: user.name,
+      email: user.email,
+      username: user.username,
+      isNewUser: isNewUser, // Include isNewUser flag
+    };
+    const token = await createToken(userPayload);
 
     // Redirect to frontend with token
     res.redirect(`${process.env.STATIC_URL}/login?token=${token}`);

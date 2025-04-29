@@ -27,8 +27,10 @@ async function tokenValidator(req, res, next) {
     try {
         const payload = await verify(token, public_key);
 
+        
         if (payload && payload.secret_key === secret_key) {
             req.body.email = payload.email;
+            req.body.userId = payload.id;
             req.body.name = payload.name;
             req.body.username = payload.username;
    
@@ -77,6 +79,7 @@ async function readverifyRegisterTokens(req, res, next) {
 
             // Attach the user details to the request body for the next middleware or route handler
             req.body.email = payload.email;
+            req.body.userId = payload.id;
             req.body.name = payload.name;
 
             console.log("User details added to request body:", req.body); // Debug: Print user info being passed along
@@ -131,6 +134,7 @@ async function readverifyForgotToken(req, res, next) {
             req.body = req.body || {};  
 
             req.body.email = payload.email;
+            req.body.userId = payload.id;
             req.body.name = payload.name;
 
             console.log("User details added to request body:", req.body); // Debug: Print user info being passed along
@@ -176,6 +180,7 @@ async function verifyRegisterToken(req, res, next) {
 
         
             req.body.email = payload.email;
+            req.body.userId = payload.id;
             req.body.name = payload.name;
             await Token.deleteOne({ token });
 
@@ -212,6 +217,7 @@ async function verifyForgotToken(req, res, next) {
 
             // Attach user information from the token payload to the request body
             req.body.email = payload.email;
+            req.body.userId = payload.id;
             req.body.name = payload.name;
 
             // Delete the token from the database after use
