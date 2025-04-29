@@ -17,11 +17,11 @@ const googleLogin = async (req, res) => {
 
     // Check if user already exists
     let user = await User.findOne({ email });
-    let username = email.split('@')[0]; // Username from email's local part
+    let username = email.split('@')[0]; 
 
     // Ensure username is not null or empty
     if (!username) {
-      // Generate a fallback username
+
       username = `user_${googleId}`;
     }
 
@@ -33,8 +33,8 @@ const googleLogin = async (req, res) => {
       user = new User({
         name,
         email,
-        username, // Use the generated or parsed username
-        password: uuidv4(), // random UUID as placeholder
+        username,
+        password: uuidv4(), 
       });
 
       try {

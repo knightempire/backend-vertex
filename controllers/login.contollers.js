@@ -1,5 +1,6 @@
 // controllers/login.contollers.js
 require('dotenv').config();
+const bcrypt = require('bcryptjs');
 
 const bcrypt = require('bcryptjs');
 const User = require('../models/user'); 
@@ -174,31 +175,32 @@ const registerUser = async (req, res) => {
   // Function to user set the password
   const createuserandPassword = async (req, res) => {
     try {
-      
-      const {password,username} = req.body;
-      const { email ,name} = req.body;
+      const { password, username } = req.body;
+      const { email, name } = req.body;
   
-      console.log('Received email:', email,name);
+      console.log('Received email:', email, name);
       console.log('Received password:', password);
       console.log('Received username:', username);
   
-  
-      // Check if both fields are provided
+      // Check if both email and password are provided
       if (!email || !password) {
         console.log('Missing email or password');
-        return res.status(400).json({ message: 'email and password are required' });
+        return res.status(400).json({ message: 'Email and password are required' });
       }
   
+      // Check if user already exists
       const existingUser = await User.findOne({ email });
       if (existingUser) {
-        console.log('email already exists:', email);
-        return res.status(400).json({ message: 'email already exists' });
+        console.log('Email already exists:', email);
+        return res.status(400).json({ message: 'Email already exists' });
       }
   
+      // Hash the password before saving it
+      const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
   
       // Create a new user instance
       console.log('Creating new user with email:', email);
-      const newUser = new User({ email, password , name ,username});
+      const newUser = new User({ email, password: hashedPassword, name, username });
   
       // Save the user to the database
       console.log('Saving new user to the database');
@@ -215,7 +217,7 @@ const registerUser = async (req, res) => {
         }
       });
     } catch (error) {
-      console.error('Error in addUser:', error);
+      console.error('Error in createuserandPassword:', error);
       return res.status(500).json({ message: 'Server error' });
     }
   };
@@ -262,27 +264,35 @@ const registerUser = async (req, res) => {
   
   
   // Function to reset password 
+  const bcrypt = require('bcryptjs');
+
+  // Function to reset user password
   const resetPassword = async (req, res) => {
     try {
       const { password, email } = req.body;
-      console.log('resetPassword')
+      console.log('resetPassword');
       console.log('Received email:', email);
       console.log('Received password:', password);
   
-      // Check if both fields are provided
+      // Check if both email and password are provided
       if (!email || !password) {
         console.log('Missing email or password');
-        return res.status(400).json({ message: 'email and password are required' });
+        return res.status(400).json({ message: 'Email and password are required' });
       }
   
       const existingUser = await User.findOne({ email });
       if (!existingUser) {
-        console.log('email does not exist');
-        return res.status(400).json({ message: 'email does not exist' });
+        console.log('Email does not exist');
+        return res.status(400).json({ message: 'Email does not exist' });
       }
   
-   
-      existingUser.password = password; // Just assign the new password, the hashing will be handled by the middleware
+      // Hash the new password before saving it
+      const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
+  
+      // Update the user's password with the hashed version
+      existingUser.password = hashedPassword;
+  
+      // Save the updated user to the database
       await existingUser.save();
       console.log('Password updated successfully:', existingUser);
   
