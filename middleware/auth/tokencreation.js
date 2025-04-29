@@ -39,7 +39,7 @@ async function registermailtoken(data) {
 
     const newToken = new Token({
         token: "123", 
-        username: data.username,
+        email: data.email,
     });
 
     const savedToken = await newToken.save();
@@ -71,7 +71,7 @@ async function forgotmailtoken(data) {
     console.log("forgotmailtoken data",data)
     const newToken = new Token({
         token: "123", 
-        username: data.username,
+        email: data.email,
     });
 
     const savedToken = await newToken.save();

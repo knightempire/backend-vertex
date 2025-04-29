@@ -28,7 +28,7 @@ async function tokenValidator(req, res, next) {
         const payload = await verify(token, public_key);
 
         if (payload && payload.secret_key === secret_key) {
-            req.body.username = payload.username;
+            req.body.email = payload.email;
             req.body.userId = payload.id;
             req.body.name = payload.name;
    
@@ -70,13 +70,13 @@ async function readverifyRegisterTokens(req, res, next) {
         const payload = await verify(token, public_key);
         console.log("Decoded payload:", payload); // Debug: Print the decoded payload
 
-        // Check if the payload contains the expected secret_key and username
+        // Check if the payload contains the expected secret_key and email
         if (payload && payload.secret_key === mail_secret_key) {
             // Ensure req.body is initialized before setting properties
             req.body = req.body || {};  // Initialize req.body if it's undefined
 
             // Attach the user details to the request body for the next middleware or route handler
-            req.body.username = payload.username;
+            req.body.email = payload.email;
             req.body.userId = payload.id;
             req.body.name = payload.name;
 
@@ -130,7 +130,7 @@ async function readverifyForgotToken(req, res, next) {
 
             req.body = req.body || {};  
 
-            req.body.username = payload.username;
+            req.body.email = payload.email;
             req.body.userId = payload.id;
             req.body.name = payload.name;
 
@@ -176,7 +176,7 @@ async function verifyRegisterToken(req, res, next) {
             }
 
         
-            req.body.username = payload.username;
+            req.body.email = payload.email;
             req.body.userId = payload.id;
             req.body.name = payload.name;
             await Token.deleteOne({ token });
@@ -213,7 +213,7 @@ async function verifyForgotToken(req, res, next) {
             }
 
             // Attach user information from the token payload to the request body
-            req.body.username = payload.username;
+            req.body.email = payload.email;
             req.body.userId = payload.id;
             req.body.name = payload.name;
 

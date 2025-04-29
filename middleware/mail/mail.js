@@ -5,11 +5,11 @@ const { registermailtoken, forgotmailtoken } = require('../auth/tokencreation');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY); 
 
-const sendregisterEmail = async (username, name, type) => {
+const sendregisterEmail = async (email, name, type) => {
   try {
     console.log("sendregisterEmail");
 
-    const tokenData = { username, name };
+    const tokenData = { email, name };
     const token = await registermailtoken(tokenData, type);
     console.log(token);
 
@@ -20,7 +20,7 @@ const sendregisterEmail = async (username, name, type) => {
       : TEMPLATE_WELCOME_MAIL(name, verificationUrl);
 
     const msg = {
-      to: username,
+      to: email,
       from: process.env.EMAIL_FROM, // e.g. 'noreply@yourdomain.com'
       subject: 'Vertx - Verify Your Email and Set Your Password',
       text: `Hello ${name},\n\nWelcome! Click the link below to verify your email and set your password:\n\n${verificationUrl}`,
@@ -36,11 +36,11 @@ const sendregisterEmail = async (username, name, type) => {
   }
 };
 
-const sendforgotEmail = async (username, name) => {
+const sendforgotEmail = async (email, name) => {
   try {
     console.log("sendforgotEmail");
 
-    const tokenData = { username, name };
+    const tokenData = { email, name };
     const token = await forgotmailtoken(tokenData);
     console.log(token);
 
@@ -49,7 +49,7 @@ const sendforgotEmail = async (username, name) => {
     const htmlContent = TEMPLATE_RESET_MAIL(name, verificationUrl);
 
     const msg = {
-      to: username,
+      to: email,
       from: process.env.EMAIL_FROM,
       subject: 'Vertx - Reset Your Password',
       text: `Hello ${name},\n\nClick the link below to reset your password:\n\n${verificationUrl}`,

@@ -12,9 +12,9 @@ const tokenSchema = new mongoose.Schema({
     type: Date,
     default: () => moment.tz("Asia/Kolkata").toDate(),
   },
-  username: {
+  email: {
     type: String,
-    required: true,  // Assuming you want to require the username
+    required: true,  // Assuming you want to require the email
   },
 
 });

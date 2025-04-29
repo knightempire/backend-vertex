@@ -27,7 +27,7 @@ app.get('/', (req, res) => {
   }
 });
 
-app.use('/users', userRouter);
+app.use('/user', userRouter);
 
 
 initGoogleAuth(app);

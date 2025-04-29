@@ -16,7 +16,7 @@ const verifyToken = (req, res) => {
         status: 200,
         message: 'Token is valid verify',
         user: {
-          username: req.body.username,
+          email: req.body.email,
           userId: req.body.userId,
           name:req.body.name,
         },
@@ -33,11 +33,11 @@ const verifyToken = (req, res) => {
 // Function to log in a user
 const loginUser = async (req, res) => {
     try {
-      const { username, password } = req.body;
+      const { email, password } = req.body;
   
-      const user = await User.findOne({ username }).populate('product_access.product_id'); 
+      const user = await User.findOne({ email }).populate('product_access.product_id'); 
       if (!user) {
-        return res.status(400).json({ message: 'Invalid username or password' });
+        return res.status(400).json({ message: 'Invalid email or password' });
       }
       console.log('User found:', user);
       console.log('User active:', user.isActive);
@@ -49,14 +49,14 @@ const loginUser = async (req, res) => {
   
       const isPasswordMatch = await bcrypt.compare(password, user.password);
       if (!isPasswordMatch) {
-        return res.status(400).json({ message: 'Invalid username or password' });
+        return res.status(400).json({ message: 'Invalid email or password' });
       }
   
       // Create user data with product details populated
       const userData = {
         id: user._id,
-        main_username: user.main_username,
         username: user.username,
+        email: user.email,
         name: user.name,
         isActive: user.isActive,
         role:user.role,
@@ -86,7 +86,7 @@ const loginUser = async (req, res) => {
 const verifyMainToken = async (req, res) => {
   try {
     // Step 1: Extract the data from the request body
-    const { username, userId, name, product_access  } = req.body;
+    const { email, userId, name, product_access  } = req.body;
 
     // Debug: Log incoming data
     console.log('Incoming request body:', req.body);
@@ -165,7 +165,7 @@ const verifyMainToken = async (req, res) => {
     if (!isMatching) {
       const userData = {
         id: user._id,
-        username: user.username,
+        email: user.email,
         name: user.name,
         isActive: user.isActive,
         role:user.role,
@@ -181,7 +181,7 @@ const verifyMainToken = async (req, res) => {
         message: 'Product access mismatch found. New token generated.',
         token: newToken,
         user: {
-          username: username,
+          email: email,
           userId: userId,
           name: name,
           role:user.role,
@@ -198,7 +198,7 @@ const verifyMainToken = async (req, res) => {
       status: 200,
       message: 'Token is valid',
       user: {
-        username: username,
+        email: email,
         userId: userId,
         name: name,
         isActive: user.isActive,
@@ -219,33 +219,33 @@ const verifyMainToken = async (req, res) => {
 // Function to register and send mail
 const registerUser = async (req, res) => {
     try {
-      const { username, name } = req.body;
+      const { email, name } = req.body;
       const type = "user";
-      console.log('Username received:', username);
+      console.log('email received:', email);
   
       // Check if both fields are provided
-      if (!username || !name) {
-        console.log('Missing username or name');
-        return res.status(400).json({ message: 'Username and name are required' });
+      if (!email || !name) {
+        console.log('Missing email or name');
+        return res.status(400).json({ message: 'email and name are required' });
       }
   
-      // Check if username already exists
-      console.log('Checking if username already exists');
-      const existingUser = await User.findOne({ username });
+      // Check if email already exists
+      console.log('Checking if email already exists');
+      const existingUser = await User.findOne({ email });
       if (existingUser) {
-        console.log('Username already exists:', username);
-        return res.status(400).json({ message: 'Username already exists' });
+        console.log('email already exists:', email);
+        return res.status(400).json({ message: 'email already exists' });
       }
   
 
-      console.log('Creating new user instance with username:', username);
-      await sendregisterEmail(username, name, type);
+      console.log('Creating new user instance with email:', email);
+      await sendregisterEmail(email, name, type);
   
 
       res.status(200).json({
         status: 200,
-        message: 'Username printed to console and email sent',
-        username,
+        message: 'email printed to console and email sent',
+        email,
       });
     } catch (error) {
       console.error('Error:', error);
@@ -259,29 +259,30 @@ const registerUser = async (req, res) => {
   const createuserandPassword = async (req, res) => {
     try {
       
-      const {password} = req.body;
-      const { username ,name} = req.body;
+      const {password,username} = req.body;
+      const { email ,name} = req.body;
   
-      console.log('Received username:', username,name);
+      console.log('Received email:', email,name);
       console.log('Received password:', password);
+      console.log('Received username:', username);
   
   
       // Check if both fields are provided
-      if (!username || !password) {
-        console.log('Missing username or password');
-        return res.status(400).json({ message: 'Username and password are required' });
+      if (!email || !password) {
+        console.log('Missing email or password');
+        return res.status(400).json({ message: 'email and password are required' });
       }
   
-      const existingUser = await User.findOne({ username });
+      const existingUser = await User.findOne({ email });
       if (existingUser) {
-        console.log('Username already exists:', username);
-        return res.status(400).json({ message: 'Username already exists' });
+        console.log('email already exists:', email);
+        return res.status(400).json({ message: 'email already exists' });
       }
   
   
       // Create a new user instance
-      console.log('Creating new user with username:', username);
-      const newUser = new User({ username, password , name ,main_username});
+      console.log('Creating new user with email:', email);
+      const newUser = new User({ email, password , name ,username});
   
       // Save the user to the database
       console.log('Saving new user to the database');
@@ -293,7 +294,7 @@ const registerUser = async (req, res) => {
         status: 200,
         message: 'User created successfully',
         user: {
-          username: newUser.username,
+          email: newUser.email,
           name: newUser.name,
         }
       });
@@ -306,36 +307,36 @@ const registerUser = async (req, res) => {
   // Function to forgot password and send mail
   const forgotPassword = async (req, res) => {
     try {
-      const { username } = req.body;
+      const { email } = req.body;
   
-      console.log('Username received:', username);
+      console.log('email received:', email);
   
-      // Check if the username is provided
-      if (!username) {
-        console.log('Missing username');
-        return res.status(400).json({ message: 'Username is required' });
+      // Check if the email is provided
+      if (!email) {
+        console.log('Missing email');
+        return res.status(400).json({ message: 'email is required' });
       }
   
-      // Find the user by username
-      const existingUser = await User.findOne({ username });
+      // Find the user by email
+      const existingUser = await User.findOne({ email });
       if (!existingUser) {
-        console.log('Username does not exist');
-        return res.status(400).json({ message: 'Username does not exist' });
+        console.log('email does not exist');
+        return res.status(400).json({ message: 'email does not exist' });
       }
   
       // Get the user's name
       const { name } = existingUser;
   
-      console.log('Sending email to:', username, 'with name:', name);
+      console.log('Sending email to:', email, 'with name:', name);
       
-      // Call the sendEmail function and pass the username and name
-      await sendforgotEmail(username, name);
+      // Call the sendEmail function and pass the email and name
+      await sendforgotEmail(email, name);
   
       // Respond with a success message
       res.status(200).json({
         status: 200,
-        message: 'Username printed to console and email sent',
-        username,
+        message: 'email printed to console and email sent',
+        email,
       });
     } catch (error) {
       console.error('Error:', error);
@@ -347,21 +348,21 @@ const registerUser = async (req, res) => {
   // Function to reset password 
   const resetPassword = async (req, res) => {
     try {
-      const { password, username } = req.body;
+      const { password, email } = req.body;
   
-      console.log('Received username:', username);
+      console.log('Received email:', email);
       console.log('Received password:', password);
   
       // Check if both fields are provided
-      if (!username || !password) {
-        console.log('Missing username or password');
-        return res.status(400).json({ message: 'Username and password are required' });
+      if (!email || !password) {
+        console.log('Missing email or password');
+        return res.status(400).json({ message: 'email and password are required' });
       }
   
-      const existingUser = await User.findOne({ username });
+      const existingUser = await User.findOne({ email });
       if (!existingUser) {
-        console.log('Username does not exist');
-        return res.status(400).json({ message: 'Username does not exist' });
+        console.log('email does not exist');
+        return res.status(400).json({ message: 'email does not exist' });
       }
   
    
@@ -373,7 +374,7 @@ const registerUser = async (req, res) => {
         status: 200,
         message: 'Password updated successfully',
         user: {
-          username: existingUser.username,
+          email: existingUser.email,
           name: existingUser.name,
         }
       });
@@ -386,34 +387,35 @@ const registerUser = async (req, res) => {
   
   const newusernamecheck = async (req, res) => {
     try {
-      const { main_username } = req.body;
+      console.log("newusernamecheck");
+      const { username } = req.body;
   
-      console.log('Username received:', main_username);
+      console.log('username received:', username);
   
       // Check if the username is provided
-      if (!main_username) {
+      if (!username) {
         console.log('Missing username');
         return res.status(400).json({ message: 'Username is required' });
       }
   
-      // Find the user by username
-      const existingUser = await User.findOne({ main_username });
+      // Find the user by username (instead of email)
+      const existingUser = await User.findOne({ username });
       if (existingUser) {
-        console.log('Username exist');
-        return res.status(400).json({ message: 'Username exist' });
+        console.log('Username exists');
+        return res.status(400).json({ message: 'Username already taken' });
       }
   
       // Respond with a success message
       res.status(200).json({
         status: 200,
-        message: 'Username available',
-        main_username,
+        message: 'Username is available',
+        username,
       });
     } catch (error) {
       console.error('Error:', error);
       res.status(500).json({ message: 'Internal server error' });
     }
   };
-
+  
 
 module.exports = { loginUser, verifyToken , registerUser,createuserandPassword ,forgotPassword,resetPassword, verifyMainToken , newusernamecheck };

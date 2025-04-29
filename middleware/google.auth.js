@@ -61,7 +61,7 @@ function initGoogleAuth(app) {
       console.log('🔙 Google callback received');
       next();
     },
-    passport.authenticate('google', { failureRedirect: 'http://localhost:8080/login', session: false }),
+    passport.authenticate('google', { failureRedirect: `${process.env.STATIC_URL}/login`, session: false }),
     (req, res) => {
       console.log('🔐 Creating JWT for user:', req.user);
 
@@ -73,7 +73,7 @@ function initGoogleAuth(app) {
 
       console.log('📦 JWT:', token);
 
-      res.redirect(`${process.env.VITE_CLIENT_URL}/login?token=${token}`);
+      res.redirect(`${process.env.STATIC_URL}/login?token=${token}`);
     }
   );
 }

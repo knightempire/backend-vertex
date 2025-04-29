@@ -21,6 +21,6 @@ user.post('/forgotpassword',forgotPassword,)
 user.post('/resetpassword', verifyForgotToken, resetPassword);
 
 
-user.get('/check/main_username', newusernamecheck, verifyToken);
+user.post('/check/username', newusernamecheck);
 
 module.exports = user;
