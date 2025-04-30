@@ -7,7 +7,7 @@ const cors = require('cors');
 const { connectToDb, getDb } = require('./config/db'); 
 const initGoogleAuth = require('./middleware/google.auth.js');
 const userRouter = require('./routers/user');
-
+const adminRoutes = require('./routers/admin.js'); 
 
 const app = express();
 
@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/user', userRouter);
-
+app.use('/admin', adminRoutes); 
 
 initGoogleAuth(app);
 
