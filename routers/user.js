@@ -31,6 +31,6 @@ user.post('/time', tokenValidator,addActiveTime);
 user.get('/people',getUsersWithRole)
 
 
-user.get('/view/collection', tokenValidator,getPostIdsByEmail);
+user.post('/view/collection', tokenValidator,getPostIdsByEmail);
 user.post('/collect', tokenValidator,insertPostIdByEmail);
 module.exports = user;

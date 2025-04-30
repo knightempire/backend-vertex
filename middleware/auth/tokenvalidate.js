@@ -17,10 +17,12 @@ const forgot_secret_key = process.env.FORGOT_SECRET_KEY;
 
 // Token verification for "create" token
 async function tokenValidator(req, res, next) {
+    console.log("tokenValidator")
     const tokenHeader = req.headers.authorization;
     const token = tokenHeader && tokenHeader.split(' ')[1];
 
     if (!token) {
+        console.log("No token provided"); // Debug: Print message if no token is provided
         return res.status(401).send({ MESSAGE: 'Missing or invalid token.' });
     }
 
@@ -37,12 +39,15 @@ async function tokenValidator(req, res, next) {
 
             // Log the payload to verify it's correct
             console.log("Token payload:", payload);
-
+            console.log("User details added to request body:"); // Debug: Print user info being passed along
             return next();  // Proceed to the next middleware or route handler
+
         } else {
+            console.log("Invalid token payload:", payload); // Debug: Print invalid payload
             return res.status(401).send({ MESSAGE: 'Invalid token payload.' });
         }
     } catch (err) {
+        
         return res.status(401).send({ MESSAGE: 'Invalid or expired token: ' + err.message });
     }
 }
