@@ -25,17 +25,20 @@ async function tokenValidator(req, res, next) {
     }
 
     try {
-        const payload = await verify(token, public_key);
+        const payload = await verify(token, public_key);  // Verify the token
 
-        
+        // Ensure payload contains required fields
         if (payload && payload.secret_key === secret_key) {
+            // Attach payload data to req.body
             req.body.email = payload.email;
             req.body.userId = payload.id;
             req.body.name = payload.name;
             req.body.username = payload.username;
-   
 
-            next();
+            // Log the payload to verify it's correct
+            console.log("Token payload:", payload);
+
+            return next();  // Proceed to the next middleware or route handler
         } else {
             return res.status(401).send({ MESSAGE: 'Invalid token payload.' });
         }
@@ -43,6 +46,7 @@ async function tokenValidator(req, res, next) {
         return res.status(401).send({ MESSAGE: 'Invalid or expired token: ' + err.message });
     }
 }
+
 
 
 // Token verification for "register" token

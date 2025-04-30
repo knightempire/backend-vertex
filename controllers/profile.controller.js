@@ -202,6 +202,42 @@ const getLoginDates = async (req, res) => {
 
   
   
+  const getUsersWithRole = async (req, res) => {
+    try {
+      console.log("Fetching users with role 'user'");
+  
+      // Step 1: Fetch all users with the role 'user' and get their profile information
+      const users = await User.find({ role: 'user' }).select('username'); // Select only the username
+  
+      if (!users || users.length === 0) {
+        return res.status(404).json({ message: 'No users found with role "user"' });
+      }
+  
+      // Step 2: Fetch profile information for each user based on userId
+      const usersWithProfile = [];
+  
+      for (let user of users) {
+        const profile = await Profile.findOne({ userId: user._id }).select('name'); // Fetch the name from profile
+  
+        if (profile) {
+          // Add the user's profile name to the user object
+          usersWithProfile.push({
+            username: user.username,
+            name: profile.name,
+          });
+        }
+      }
+  
+      // Step 3: Send the list of users along with their profile names
+      res.status(200).json({
+        message: 'Users fetched successfully',
+        users: usersWithProfile,  // Send the list of users with their profile names
+      });
+    } catch (error) {
+      console.error('Error fetching users with role "user":', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+  
 
-
-module.exports = { userprofile ,updateProfile, getLoginDates,addActiveTime};
+module.exports = { userprofile ,updateProfile, getLoginDates,addActiveTime,getUsersWithRole};
