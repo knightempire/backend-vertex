@@ -9,94 +9,116 @@ const Token = require('../models/token');
 const {createToken} = require('../middleware/auth/tokencreation'); 
 const {sendregisterEmail,sendforgotEmail} = require('../middleware/mail/mail'); 
 const moment = require('moment-timezone'); 
+const user = require('../models/user');
 
 
-const verifyToken = (req, res) => {
-    try {
-  
-      res.status(200).json({
-        status: 200,
-        message: 'Token is valid verify',
-        user: {
-          email: req.body.email,
-          name:req.body.name,
-        },
-      });
-    } catch (err) {
-      console.error('Token verification error:', err);
-      res.status(401).json({
-        message: 'Invalid or expired token',
+const verifyToken = async (req, res) => {
+  try {
+    // Ensure email is provided
+    const { email, name } = req.body;
+    if (!email || !name) {
+      return res.status(400).json({
+        message: 'Email and name are required',
       });
     }
-  };
 
+    // Find the user by email
+    const user = await User.findOne({ email });
+    
+    // Check if user exists
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found',
+      });
+    }
 
-  const loginUser = async (req, res) => {
-    try {
-      const { email, password } = req.body;
-  
-      // Find user by email
-      const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(400).json({ message: 'Invalid email or password' });
-      }
-      
-      console.log('User found:', user);
-      console.log('User active:', user.isActive);
-  
-      // Check if the user is active
-      if (!user.isActive) {
-        return res.status(400).json({ message: 'User is inactive. Please contact support.' });
-      }
-  
-      // Check if the password matches
-      const isPasswordMatch = await bcrypt.compare(password, user.password);
-      if (!isPasswordMatch) {
-        return res.status(400).json({ message: 'Invalid email or password' });
-      }
-  
-      // Get today's date in 'Asia/Kolkata' timezone
-      const today = moment().tz('Asia/Kolkata').format('YYYY-MM-DD');
-      
-      // Check if the login date already exists in the loginDates array
-      if (!user.loginDates.includes(today)) {
-        // Add today's date to the loginDates array
-        user.loginDates.push(today);
-        
-        // Save the updated user document
-        await user.save();
-      }
-  
-      // Prepare user data to send to the client
-      const userData = {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        name: user.name,
-        isActive: user.isActive,
+    // Return a successful response with user details
+    res.status(200).json({
+      status: 200,
+      message: 'Token is valid, verified',
+      user: {
+        email,
+        name,
         role: user.role,
-      };
-  
-      console.log("login", userData);
-  
-      // Create a token for the user
-      const token = await createToken(userData);
-  
-      // Clean up userData before sending it to the client
-      delete userData.secret_key;
-      delete userData.id;
-  
-      // Send response to the client
-      res.status(200).json({
-        message: 'Login successful',
-        token,
-        user: userData,  // Send the user data without the secret_key
-      });
-    } catch (error) {
-      console.error('Error logging in user:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      },
+    });
+  } catch (err) {
+    console.error('Token verification error:', err);
+    res.status(500).json({
+      message: 'An error occurred during token verification',
+    });
+  }
+};
+
+
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid email or password' });
     }
-  };
+
+    // Log user data for debugging
+    console.log('User found:', user);
+    console.log('User active:', user.isActive);
+
+    // Check if the user is active
+    if (!user.isActive) {
+      return res.status(400).json({ message: 'User is inactive. Please contact support.' });
+    }
+
+    // Check if the password matches
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
+      return res.status(400).json({ message: 'Invalid email or password' });
+    }
+
+    // Get today's date in 'Asia/Kolkata' timezone
+    const today = moment().tz('Asia/Kolkata').format('YYYY-MM-DD');
+    
+    // Check if the login date already exists in the loginDates array
+    if (!user.loginDates.includes(today)) {
+      // Add today's date to the loginDates array
+      user.loginDates.push(today);
+      
+      // Save the updated user document
+      await user.save();
+    }
+
+    // Prepare user data to send to the client
+    const userData = {
+      username: user.username,
+      email: user.email,
+      name: user.name,
+      isActive: user.isActive,
+      role: user.role, // Include the role here for front-end routing
+    };
+
+    console.log("User data prepared:", userData);
+
+    // Create a token for the user
+    const token = await createToken(userData);
+
+    // Clean up sensitive user data before sending it to the client
+    delete userData.secret_key;
+    // You might want to delete the `_id` field if not needed
+    // delete userData._id;
+
+    // Send response to the client with user data and token
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      user: userData,  // Send the user data without secret_key or any sensitive info
+    });
+  } catch (error) {
+    console.error('Error logging in user:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
   
 
 
