@@ -153,47 +153,36 @@ const getLoginDates = async (req, res) => {
     try {
       console.log("Adding active time");
       console.log("Request body:", req.body);
-      const { email, activityTime } = req.body; // Get the email and activity time from the request body
+      const { email, activityTime } = req.body;
   
       if (!email || activityTime === undefined) {
         return res.status(400).json({ message: 'Email and activity time are required' });
       }
   
-      // Step 1: Find the user by email
       const user = await User.findOne({ email });
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(201).json({ message: 'Profile not found, skipping.' });
       }
   
-      // Step 2: Get the current day of the week and date in Asia/Kolkata timezone
       const now = moment().tz('Asia/Kolkata');
-      const dayOfWeek = now.day(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+      const dayOfWeek = now.day();
   
-      console.log(`Day of the week: ${dayOfWeek}`); // Log the day of the week for debugging
+      const activeTime = [...user.activeTime];
   
-      // Step 3: Update the activeTime array for the current day
-      const activeTime = [...user.activeTime]; // Make a copy of the activeTime array
-  
-      // If the day is already within the activeTime array (index 0-6 corresponding to Mon-Sun)
       if (activeTime[dayOfWeek] !== undefined) {
-        // If activity time already exists for this day, add to the existing time
         activeTime[dayOfWeek] += activityTime;
       } else {
-        // Otherwise, initialize the activity time for the day
         activeTime[dayOfWeek] = activityTime;
       }
   
-      // Step 4: Update the user's activeTime array in the database
       user.activeTime = activeTime;
-  
-      // Save the user document
       await user.save();
   
-      // Step 5: Return the updated activeTime
       res.status(200).json({
         message: 'Activity time updated successfully',
-        activeTime: user.activeTime, // Send the updated activeTime array
+        activeTime: user.activeTime,
       });
+  
     } catch (error) {
       console.error('Error adding active time:', error);
       res.status(500).json({ message: 'Internal server error' });

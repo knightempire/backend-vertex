@@ -22,15 +22,7 @@ const verifyToken = async (req, res) => {
       });
     }
 
-    // Find the user by email
-    const user = await User.findOne({ email });
-    
-    // Check if user exists
-    if (!user) {
-      return res.status(404).json({
-        message: 'User not found',
-      });
-    }
+
 
     // Return a successful response with user details
     res.status(200).json({
@@ -49,6 +41,8 @@ const verifyToken = async (req, res) => {
     });
   }
 };
+
+
 
 
 const loginUser = async (req, res) => {
