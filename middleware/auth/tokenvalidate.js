@@ -36,6 +36,7 @@ async function tokenValidator(req, res, next) {
             req.body.userId = payload.id;
             req.body.name = payload.name;
             req.body.username = payload.username;
+            req.body.role = payload.role;
 
             // Log the payload to verify it's correct
             console.log("Token payload:", payload);
@@ -48,6 +49,48 @@ async function tokenValidator(req, res, next) {
         }
     } catch (err) {
         
+        return res.status(401).send({ MESSAGE: 'Invalid or expired token: ' + err.message });
+    }
+}
+
+// Token verification for "create" token
+async function adimtokenValidator(req, res, next) {
+    console.log("admintokenValidator")
+    const tokenHeader = req.headers.authorization;
+    const token = tokenHeader && tokenHeader.split(' ')[1];
+
+    if (!token) {
+        console.log("No token provided"); // Debug: Print message if no token is provided
+        return res.status(401).send({ MESSAGE: 'Missing or invalid token.' });
+    }
+
+    try {
+        const payload = await verify(token, public_key);  // Verify the token
+
+        // Ensure payload contains required fields
+        if (payload && payload.secret_key === secret_key) {
+            // Attach payload data to req.body
+            req.body.email = payload.email;
+            req.body.userId = payload.id;
+            req.body.name = payload.name;
+            req.body.username = payload.username;
+            req.body.role = payload.role;
+
+            // Log the payload to verify it's correct
+            console.log("Token payload:", payload);
+            console.log("User details added to request body:"); // Debug: Print user info being passed along
+            console.log("User role:", payload.role); // Debug: Print user role
+            if(payload.role !== "admin") {
+                return res.status(401).send({ MESSAGE: 'You are not authorized to access this resource.' });
+            }
+            return next();  // Proceed to the next middleware or route handler
+
+        } else {
+            console.log("Invalid token payload:", payload); // Debug: Print invalid payload
+            return res.status(401).send({ MESSAGE: 'Invalid token payload.' });
+        }
+    } catch (err) {
+        console.error("Token verification error:", err.message); // Debug: Print error message
         return res.status(401).send({ MESSAGE: 'Invalid or expired token: ' + err.message });
     }
 }
@@ -254,4 +297,5 @@ module.exports = {
     verifyForgotToken,
     readverifyForgotToken,
     readverifyRegisterTokens,
+    adimtokenValidator
 };

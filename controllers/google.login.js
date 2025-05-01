@@ -77,6 +77,7 @@ const googleLogin = async (req, res) => {
       email: user.email,
       username: user.username,
       isNewUser: isNewUser, // Include isNewUser flag
+      role: user.role,
     };
     const token = await createToken(userPayload);
 
