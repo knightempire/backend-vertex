@@ -1,0 +1,31 @@
+
+
+services:
+  vertx_assign: # Define a service named 'app'
+    build: . # Build the image from the Dockerfile in the current directory
+    container_name: vertx_assign # Optional: give the container a specific name
+    ports:
+      - "5000:5000" # Map port 5000 on the host to port 5000 in the container
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
+      DB_NAME: ${DB_NAME}
+      PORT: ${PORT:-5000} # Provides a default value if PORT is not set
+      SECRET_KEY: ${SECRET_KEY}
+      EXPIRES_IN: ${EXPIRES_IN}
+      MAIL_EXPIRES_IN: ${MAIL_EXPIRES_IN}
+      MAIL_SECRET_KEY: ${MAIL_SECRET_KEY}
+      FORGOT_SECRET_KEY: ${FORGOT_SECRET_KEY}
+      STATIC_URL: ${STATIC_URL}
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      EMAIL_FROM: ${EMAIL_FROM}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
+    restart: unless-stopped # Optional: Restart policy
+
+   
+
+networks:
+  default:
+    driver: bridge
+
