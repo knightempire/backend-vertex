@@ -177,7 +177,7 @@ const TEMPLATE_WELCOME_MAIL = (name, verificationUrl) => {
  <main>
             <h1>Hello ${name},</h1> <br>
             
-            <p class="verification-text">Welcome to VERTX – your go-to hub for real-time content! Stay updated with trending posts and discussions from across the web, all curated just for you.</p>
+            <p class="verification-text">Welcome to Linkedin – your go-to hub for real-time content! Stay updated with trending posts and discussions from across the web, all curated just for you.</p>
 
             
       
@@ -193,13 +193,13 @@ const TEMPLATE_WELCOME_MAIL = (name, verificationUrl) => {
     
             <p class="regards-text">
                 Regards, <br>
-                VERTX <br>
+                Linkedin <br>
               
             </p>
         </main>
     
         <footer>
-            <p class="contact-text">Should you have any questions or require assistance, please feel free to reach out to our team at <a href="mailto:#" class="contact-link">vertx.com</a></p>
+            <p class="contact-text">Should you have any questions or require assistance, please feel free to reach out to our team at <a href="mailto:#" class="contact-link">Linkedin.com</a></p>
         </footer>
     </div>
 </body>
@@ -239,13 +239,13 @@ const TEMPLATE_RESET_MAIL = (name, verificationUrl) => {
     
             <p class="regards-text">
                 Regards, <br>
-                VERTX 
+                Linkedin 
           
             </p>
         </main>
     
         <footer>
-            <p class="contact-text">Should you have any questions or require assistance, please feel free to reach out to our team at <a href="mailto:#" class="contact-link">vertx.com</a></p>
+            <p class="contact-text">Should you have any questions or require assistance, please feel free to reach out to our team at <a href="mailto:#" class="contact-link">Linkedin.com</a></p>
         </footer>
     </div>
 </body>
@@ -271,7 +271,7 @@ const TEMPLATE_RESET_MAIL = (name, verificationUrl) => {
         <main>
             <h1>Hello ${name},</h1> <br>
             
-           <p class="verification-text">Welcome to VERTX Admin – your command center for managing content, tracking trends, and empowering the platform.</p>
+           <p class="verification-text">Welcome to Linkedin Admin – your command center for managing content, tracking trends, and empowering the platform.</p>
 
 
             <div class="verification-code">
@@ -286,13 +286,13 @@ const TEMPLATE_RESET_MAIL = (name, verificationUrl) => {
     
             <p class="regards-text">
                 Regards, <br>
-                VERTX 
+                Linkedin 
           
             </p>
         </main>
     
         <footer>
-            <p class="contact-text">Should you have any questions or require assistance, please feel free to reach out to our team at <a href="mailto:#" class="contact-link">vertx.com</a></p>
+            <p class="contact-text">Should you have any questions or require assistance, please feel free to reach out to our team at <a href="mailto:#" class="contact-link">Linkedin.com</a></p>
         </footer>
     </div>
 </body>
