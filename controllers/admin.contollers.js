@@ -28,37 +28,41 @@ const viewReports = async (req, res) => {
 
 
 const viewUsers = async (req, res) => {
-    try {
-      // Fetch all users
-      const users = await User.find({});
-  
-      // Fetch all profiles
-      const profiles = await Profile.find();
-  
-      // Create a map of profiles by userId
-      const profileMap = profiles.reduce((acc, profile) => {
-        acc[profile.userId.toString()] = profile;
-        return acc;
-      }, {});
-  
-      // Map over users and replace the name with profile name if available
-      const usersWithProfiles = users.map((user) => {
-        // Check if there is a profile for this user
-        const profile = profileMap[user._id.toString()] || null;
-  
-        return {
-          ...user.toObject(), // Spread the user data
-          name: profile ? profile.name : user.name // If profile exists, use profile name; otherwise, use user name
-        };
-      });
-  
-      return res.status(200).json(usersWithProfiles);
-    } catch (error) {
-      console.error('Error fetching users with profiles:', error);
-      return res.status(500).json({ message: 'Error fetching users with profiles' });
+  try {
+    // Fetch all profiles
+    const profiles = await Profile.find().lean(); // Only fetching profiles now
+    
+    // Return profiles as the response
+    return res.status(200).json(profiles);
+  } catch (error) {
+    console.error('Error fetching profiles:', error);
+    return res.status(500).json({ message: 'Error fetching profiles' });
+  }
+};
+
+
+
+const getProfileById = async (req, res) => {
+  try {
+    const { profileId } = req.params; // Get profileId from URL params
+    
+    // Fetch profile by its unique ID
+    const profile = await Profile.findById(profileId).lean();
+    
+    // Check if profile exists
+    if (!profile) {
+      return res.status(404).json({ message: 'Profile not found' });
     }
-  };
-  
+    
+    // Return the profile data as response
+    return res.status(200).json(profile);
+  } catch (error) {
+    console.error('Error fetching profile by ID:', error);
+    return res.status(500).json({ message: 'Error fetching profile by ID' });
+  }
+};
+
+
   
 
-module.exports = { viewReports,viewUsers };
+module.exports = { viewReports,viewUsers ,getProfileById };
