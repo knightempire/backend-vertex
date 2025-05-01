@@ -3,7 +3,7 @@ const express = require('express');
 const user = express.Router();  
 const { loginUser, verifyToken,registerUser, createuserandPassword ,resetPassword , forgotPassword,verifyMainToken , newusernamecheck} = require('../controllers/login.contollers');
 const {tokenValidator,verifyRegisterToken,verifyForgotToken,readverifyRegisterTokens, readverifyForgotToken} = require('../middleware/auth/tokenvalidate');
-const { userprofile,updateProfile,getLoginDates ,addActiveTime,getUsersWithRole} = require('../controllers/profile.controller');
+const { userprofile,updateProfile,getLoginDates ,addActiveTime,getUsersWithProfile} = require('../controllers/profile.controller');
 const { getPostIdsByEmail ,insertPostIdByEmail,insertReportByEmail} = require('../controllers/post');
 
 user.post('/login', loginUser);
@@ -28,7 +28,7 @@ user.post('/activity', tokenValidator,getLoginDates);
 
 
 user.post('/time', tokenValidator,addActiveTime);
-user.get('/people',getUsersWithRole)
+user.get('/people',getUsersWithProfile)
 
 
 user.post('/view/collection', tokenValidator,getPostIdsByEmail);

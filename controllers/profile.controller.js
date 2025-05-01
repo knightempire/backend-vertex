@@ -192,42 +192,44 @@ const getLoginDates = async (req, res) => {
 
   
   
-  const getUsersWithRole = async (req, res) => {
+  const getUsersWithProfile = async (req, res) => {
     try {
-      console.log("Fetching users with role 'user'");
+      console.log("Fetching users with profile data");
   
-      // Step 1: Fetch all users with the role 'user' and get their profile information
-      const users = await User.find({ role: 'user' }).select('username'); // Select only the username
+      // Step 1: Fetch all profiles with only the 'name' and 'userId' fields
+      const profiles = await Profile.find().select('name email userId'); // Select 'name', 'email', and 'userId'
   
-      if (!users || users.length === 0) {
-        return res.status(404).json({ message: 'No users found with role "user"' });
+      if (!profiles || profiles.length === 0) {
+        return res.status(404).json({ message: 'No profiles found' });
       }
   
-      // Step 2: Fetch profile information for each user based on userId
+      // Step 2: Prepare the list of users with their profile data (name, email)
       const usersWithProfile = [];
   
-      for (let user of users) {
-        const profile = await Profile.findOne({ userId: user._id }).select('name'); // Fetch the name from profile
+      for (let profile of profiles) {
+        // Assuming 'profile.userId' contains the reference to the User model
+        const user = await User.findById(profile.userId).select('email'); // Fetch only email from User collection
   
-        if (profile) {
-          // Add the user's profile name to the user object
+        if (user) {
+          // Add the user's email and profile name to the result
           usersWithProfile.push({
-            username: user.username,
-            name: profile.name,
+            name: profile.name,   // Profile name
+            email: profile.email, // Profile email (since it is stored in the Profile schema now)
           });
         }
       }
   
-      // Step 3: Send the list of users along with their profile names
+      // Step 3: Send the list of users with their profile data
       res.status(200).json({
-        message: 'Users fetched successfully',
-        users: usersWithProfile,  // Send the list of users with their profile names
+        message: 'Users with profile data fetched successfully',
+        users: usersWithProfile,  // Send the list of users with their profile name and email
       });
     } catch (error) {
-      console.error('Error fetching users with role "user":', error);
+      console.error('Error fetching users with profile data:', error);
       res.status(500).json({ message: 'Internal server error' });
     }
   };
   
+  
 
-module.exports = { userprofile ,updateProfile, getLoginDates,addActiveTime,getUsersWithRole};
+module.exports = { userprofile ,updateProfile, getLoginDates,addActiveTime,getUsersWithProfile};

@@ -1,31 +1,57 @@
 const mongoose = require('mongoose');
 const moment = require('moment-timezone');
 
-// Define message schema
-const messageSchema = new mongoose.Schema(
-  {
-    fromUser: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User', // References the 'User' model (fromUser is the sender)
-      required: true,
-    },
-    toUser: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User', // References the 'User' model (toUser is the receiver)
-      required: true,
-    },
-    message: {
-      type: String,
-      required: true,
-      trim: true, // Trim whitespace from the message
-    },
-    timestamp: {
-      type: Date,
-      default: () => moment().tz('Asia/Kolkata').toDate(), // Set the timestamp to the current date and time
-    },
+// Define message schema to be embedded inside the conversation
+const messageSchema = new mongoose.Schema({
+  sender: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   },
-  { timestamps: true } // Automatically adds 'createdAt' and 'updatedAt' fields
-);
+  recipient: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  text: {
+    type: String,
+    required: true
+  },
+  createdAt: {
+    type: Date,
+    default: () => moment().tz('Asia/Kolkata').toDate()
+  }
+}, { _id: false });
 
-// Export Message model
-module.exports = mongoose.model('Message', messageSchema);
+// Define conversation schema
+const conversationSchema = new mongoose.Schema({
+  participants: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    }
+  ],
+  messages: [messageSchema],  // Array of message references
+  lastMessage: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Message'
+  },
+  createdAt: {
+    type: Date,
+    default: () => moment().tz('Asia/Kolkata').toDate()
+  },
+  updatedAt: {
+    type: Date,
+    default: () => moment().tz('Asia/Kolkata').toDate()
+  }
+});
+
+// Update the updatedAt before saving the conversation
+conversationSchema.pre('save', function (next) {
+  this.updatedAt = moment().tz('Asia/Kolkata').toDate();
+  next();
+});
+
+// Export the Conversation model
+module.exports = mongoose.model('Conversation', conversationSchema);
